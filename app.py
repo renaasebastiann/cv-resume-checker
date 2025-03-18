@@ -11,17 +11,13 @@ from sklearn.metrics.pairwise import cosine_similarity
 import spacy
 from datetime import datetime
 
-# Download NLTK resources
 nltk.download('punkt')
 nltk.download('stopwords')
 
-# Load NLP model
 nlp = spacy.load("en_core_web_sm")
 
 st.set_page_config(page_title="Resume ATS Checker", layout="wide")
 
-
-# Function to extract text from PDF
 def extract_text_from_pdf(pdf_file):
     text = ""
     with pdfplumber.open(pdf_file) as pdf:
@@ -29,7 +25,6 @@ def extract_text_from_pdf(pdf_file):
             text += page.extract_text() or ""
     return text
 
-# Function to extract text from DOCX
 def extract_text_from_docx(docx_file):
     doc = docx.Document(docx_file)
     text = ""
@@ -37,7 +32,6 @@ def extract_text_from_docx(docx_file):
         text += para.text + "\n"
     return text
 
-# Function to preprocess text
 def preprocess_text(text):
     text = text.lower()
     text = re.sub(r'[^\w\s]', ' ', text)
@@ -65,32 +59,31 @@ def check_format_issues(resume_text):
     issues = []
     if isinstance(resume_text, bytes):
         resume_text = resume_text.decode('utf-8')
-    if isinstance(resume_text, str):  # Ensure resume_text is a string
+    if isinstance(resume_text, str):  
         if len(resume_text) < 300:
             issues.append("Resume is too short. Consider adding more content.")
     else:
         issues.append("Invalid resume text format. Expected a string.")
 
-    # Check for contact information
+  
     if not re.search(r'[\w\.-]+@[\w\.-]+', resume_text):
         issues.append("Email address might be missing")
 
     if not re.search(r'\b\d{3}[-.]?\d{3}[-.]?\d{4}\b', resume_text):
         issues.append("Phone number might be missing")
 
-    # Check for education section
+  
     edu_keywords = ['education', 'university', 'college', 'degree', 'bachelor', 'master', 'phd']
     if not any(keyword in resume_text.lower() for keyword in edu_keywords):
         issues.append("Education section might be missing")
 
-    # Check for experience section
+
     exp_keywords = ['experience', 'work', 'job', 'employment', 'career']
     if not any(keyword in resume_text.lower() for keyword in exp_keywords):
         issues.append("Work experience section might be missing")
 
     return issues
 
-# CVProcessor class
 class CVProcessor:
     def __init__(self):
         self.location_pattern = re.compile(r"(?i)(address|location):?\s*(.+)")
@@ -172,8 +165,7 @@ class CVProcessor:
         else:
             print("No location found")
             return "Unknown"
-
-# CandidateScorer class
+            
 class CandidateScorer:
     def __init__(self, job_description):
         print("\nInitializing Candidate Scorer...")
@@ -294,7 +286,6 @@ class RecruitmentSystem:
             print(f"Error calculating scores: {str(e)}")
             return pd.DataFrame()
 
-# Streamlit App
 def main():
     st.title("CV/Resume ATS Checker")
     st.subheader("Upload your resume and configure the job posting")
@@ -343,7 +334,6 @@ def main():
             st.subheader("Top Candidates")
             st.dataframe(results[['id', 'final_score']])
     
-# Add explanations and tips
 st.sidebar.title("How ATS Works")
 st.sidebar.write("""
 An Applicant Tracking System (ATS) is software used by employers to manage job applications. Here's how it works:
