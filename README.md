@@ -1,4 +1,4 @@
-# cv-resume-checker
+# CV-Resume-Checker
 
 Overview
 
